@@ -1,4 +1,5 @@
 export class StatisticsVo {
+  date: string;
   pricePerMCount: number;
   pricePerMMean: number;
   pricePerMStd: number;

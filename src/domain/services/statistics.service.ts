@@ -5,16 +5,13 @@ import { RegionVo } from '../valueObjects/region.vo';
 import { StatisticsRepository } from '../repository/statisticsRepository';
 import { StatisticsVo } from '../valueObjects/statistics.vo';
 import { Inject, Injectable } from '@nestjs/common';
-import { SellFlatsFromPrimaryMarketStatistics } from '../../infrastructure/mysql/statistics/repository/sellFlatsFromPrimaryMarket.statistics';
-import { SellFlatsFromAfterMarketStatistics } from '../../infrastructure/mysql/statistics/repository/sellFlatsFromAfterMarket.statistics';
+import { Statistics } from '../../infrastructure/mysql/statistics/repository/statistics';
 
 @Injectable()
 export class StatisticsService {
   constructor(
-    @Inject(SellFlatsFromPrimaryMarketStatistics)
-    private sellFlatsPrimaryMarketRepository: StatisticsRepository,
-    @Inject(SellFlatsFromAfterMarketStatistics)
-    private sellFlatsAfterMarketRepository: StatisticsRepository,
+    @Inject(Statistics)
+    private statistics: StatisticsRepository,
   ) {}
 
   async lastMonthForRegion(
@@ -23,21 +20,37 @@ export class StatisticsService {
     marketType: MarketTypeVo,
     area: number,
     region: RegionVo,
+  ): Promise<StatisticsVo | null> {
+    const stats: StatisticsVo[] = await this.statistics.forRegion(
+      leadType,
+      marketType,
+      objectType,
+      area,
+      region.parentId ? region.parentId.id : region.id.id,
+      0,
+    );
+
+    if (null === stats) {
+      return null;
+    }
+
+    return stats.shift();
+  }
+
+  async lastYearForRegion(
+    leadType: LeadTypeVo,
+    objectType: ObjectTypeVo,
+    marketType: MarketTypeVo,
+    area: number,
+    region: RegionVo,
   ): Promise<StatisticsVo[] | null> {
-    if (leadType.isSell() && marketType.isPrimary() && objectType.isFlat()) {
-      return this.sellFlatsPrimaryMarketRepository.byAreaAndRegionForLastMonth(
-        area,
-        region.parentId ? region.parentId.id : region.id.id,
-      );
-    }
-
-    if (leadType.isSell() && marketType.isAfter() && objectType.isFlat()) {
-      return this.sellFlatsAfterMarketRepository.byAreaAndRegionForLastMonth(
-        area,
-        region.parentId ? region.parentId.id : region.id.id,
-      );
-    }
-
-    return null;
+    return this.statistics.forRegion(
+      leadType,
+      marketType,
+      objectType,
+      area,
+      region.parentId ? region.parentId.id : region.id.id,
+      11,
+    );
   }
 }

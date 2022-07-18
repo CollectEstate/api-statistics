@@ -11,9 +11,8 @@ import { RealestateCities } from '../../infrastructure/mysql/Realestates/entity/
 import { RealestateLeads } from '../../infrastructure/mysql/Realestates/entity/realestateLeads';
 import { LeadStatisticsService } from './services/leadStatistics.service';
 import { StatisticsService } from '../../domain/services/statistics.service';
-import { SellFlatsFromPrimaryMarketStatistics } from '../../infrastructure/mysql/statistics/repository/sellFlatsFromPrimaryMarket.statistics';
-import { SellFlatsFromAfterMarketStatistics } from '../../infrastructure/mysql/statistics/repository/sellFlatsFromAfterMarket.statistics';
 import { StatisticsCrossAggregates } from '../../infrastructure/mysql/statistics/entity/statisticsCrossAggregates';
+import { Statistics } from '../../infrastructure/mysql/statistics/repository/statistics';
 
 @Module({
   imports: [
@@ -35,8 +34,7 @@ import { StatisticsCrossAggregates } from '../../infrastructure/mysql/statistics
     LeadRepository,
     LeadStatisticsService,
     StatisticsService,
-    SellFlatsFromPrimaryMarketStatistics,
-    SellFlatsFromAfterMarketStatistics,
+    Statistics,
   ],
   controllers: [ValuationController],
 })
